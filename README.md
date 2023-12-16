@@ -1,5 +1,11 @@
 # WhatsApp Message Protocol Sniffer
 
+## Demo
+
+[Watch the video](https://youtu.be/nxdJFEe2fyw)
+
+[![Watch the video](https://img.youtube.com/vi/nxdJFEe2fyw/hqdefault.jpg)](https://youtu.be/nxdJFEe2fyw)
+
 ## How to run
 
 ### Clone this repo
