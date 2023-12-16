@@ -17,8 +17,8 @@ COPY main.go main.go
 COPY go.mod go.mod
 COPY go.sum go.sum
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go get
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o whats-sniff
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go get
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -a -o whats-sniff
 
 COPY Docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
