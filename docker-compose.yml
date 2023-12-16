@@ -1,0 +1,33 @@
+version: '3'
+services:
+  whats-sniff:
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile.whats-sniff
+    volumes:
+      - ./ws_data/media:/app/ws_data/media
+      - ./ws_data/history:/app/ws_data/history
+      - ./ws_data/db:/app/ws_data/db
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    command: ["/app/whats-sniff" ]
+    
+  pocketbase:
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile.pocketbase
+    volumes:
+      - ./pb_data/pb_data:/app/data/pb_data
+      - ./pb_data/pb_public:/app/data/pb_public
+      - ./pb_data/pb_hooks:/app/data/pb_hooks
+      - ./pb_migrations:/app/pb_migrations
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8090/_/ || exit 1"]
+      interval: 10s
+      start_period: 10s
+      timeout: 5s
+      retries: 4
+    restart: unless-stopped

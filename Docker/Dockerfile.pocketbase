@@ -1,0 +1,46 @@
+FROM alpine:3 as downloader
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG POCKETBASE_VERSION=0.20.0
+
+
+ENV BUILDX_ARCH="${TARGETOS:-linux}_${TARGETARCH:-amd64}"
+ENV DEFAULT_APP="/app/pocketbase.sh"
+ENV DEFAULT_APP_ARGS="--dir=${DEFAULT_APP_DATA:-/app/data/pb_data} --publicDir=${DEFAULT_APP_PUBLIC:-/app/data/pb_public} --migrationsDir=${DEFAULT_APP_MIGRATIONS:-/app/pb_migrations} --hooksDir=${DEFAULT_APP_HOOKS:-/app/data/pb_hooks} "
+
+WORKDIR /app
+
+
+RUN apk add --no-cache \
+    ca-certificates \
+    bash \
+    curl \
+    unzip \
+    wget \
+    zip \
+    zlib-dev \
+    && update-ca-certificates
+
+ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
+
+RUN unzip /tmp/pocketbase.zip -d /tmp/pocketbase && \
+    chmod +x /tmp/pocketbase/pocketbase && \
+    mv /tmp/pocketbase/pocketbase /app/pocketbase && \
+    rm -rf /tmp/pocketbase && \
+    rm /tmp/pocketbase.zip && \
+    rm -rf /tmp/pocketbase
+
+VOLUME [ "/app/data/pb_data", "/app/data/pb_public" ]
+EXPOSE 8090
+
+COPY ./Docker/pocketbase.sh /app/pocketbase.sh
+RUN chmod +x /app/pocketbase.sh
+
+COPY ./Docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s CMD curl --fail http://localhost:8090/_/ || exit 1
+
+CMD [ "serve", "--http=0.0.0.0:8090" ]

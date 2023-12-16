@@ -1,0 +1,29 @@
+
+# Use the official Go image as the base image
+# FROM golang:latest AS builder
+FROM golang:latest
+
+RUN apt update && apt install python3 python3-pip python3-venv -y
+RUN python3 -m venv /venv
+ENV PATH=/venv/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV VIRTUAL_ENV=/ven
+
+ENV DEFAULT_APP="/app/whats-sniff"
+
+WORKDIR /app
+
+COPY whatsmeow whatsmeow
+COPY main.go main.go
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go get
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o whats-sniff
+
+COPY Docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set the entry point for the container
+CMD ["/app/whats-sniff"]
+
+ENTRYPOINT [ "/entrypoint.sh" ]%  
