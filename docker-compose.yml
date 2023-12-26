@@ -19,7 +19,7 @@ services:
       dockerfile: ./Docker/Dockerfile.pocketbase
     volumes:
       - ./pb_data/pb_data:/app/data/pb_data
-      - ./pb_data/pb_public:/app/data/pb_public
+      - ./pb_public:/app/data/pb_public
       - ./pb_data/pb_hooks:/app/data/pb_hooks
       - ./pb_migrations:/app/pb_migrations
     ports:
